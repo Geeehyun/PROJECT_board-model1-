@@ -1,3 +1,4 @@
+<%@page import="common.PageUtil"%>
 <%@page import="model1.bbs.BbsDAO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page trimDirectiveWhitespaces="true" %>
@@ -94,6 +95,9 @@ List<BbsDTO> bbsList = dao.bbsPagingList(param);
 int total_count = dao.bbsTotalCount(param);
 dao.close();
 
+//게시글 html 생성
+String boardList = PageUtil.makeList(bbsList, total_count, page_selected, queryStringPCW);
+
 // 페이징 관련 부분
 
 //총페이지 개수 계산
@@ -101,6 +105,9 @@ int total_page = (int) Math.ceil((double)total_count / 10);
 
 // 페이징의 시작 페이지 번호 계산
 int startPage = ((int) Math.floor((((double)page_selected - 1)*0.1))*10)+1; // 좀 더 쉬운방법이 있으면 좋겠음.
+
+// 페이징 html 코드 만들어내기
+String pageList = PageUtil.makeMageNumber(total_page, startPage, page_selected, queryStringCW);
 
 // <<, <, >, >> 버튼 클릭 시 이동할 페이징 계산
 int prev = (page_selected > 1)? page_selected - 1 : 1;
@@ -139,54 +146,13 @@ int grandNext = (page_selected < total_page) ? (((page_selected + 10) < total_pa
 			</tr>
 		</thead>
  		<tbody>
-			<%
-				if(!bbsList.isEmpty()) {
-					// 게시글 idx 계산 부분 (실제 DB 상 idx와 다름)
-					int row_no = (total_count) - (page_selected > 1 ? ((page_selected)-1)*10 : 0);
-					for(BbsDTO e : bbsList) {		
-						String viewURL = "view.jsp?"+"idx="+e.getIdx()+"&"+queryStringPCW;    
-			%>
-			<tr>
-				<td><a href=<%=viewURL%>><%= row_no %></a></td>
-				<td><a href=<%=viewURL%>><%= e.getTitle() %></a></td>
-				<td><a href=<%=viewURL%>><%= e.getUser_id() %></a></td>
-				<td><a href=<%=viewURL%>><%= e.getRead_cnt() %></a></td>
-				<td><a href=<%=viewURL%>><%= e.getReg_date() %></a></td>
-			<tr>
-			<% 
-					row_no --;
-					}
-			%>
-			<%	
-				} else {
-			%>
-			<tr>
-				<td colspan="5">표시할 게시글이 없습니다.</td>
-			</tr>
-			<%
-				}
-			%>
+			<%= boardList %>
 		</tbody>
 	</table>
 	<div class="pageArea">
 		<span><a class="prev" href="list.jsp?page_selected=<%= grandPrev %>&<%= queryStringCW%>">&lt;&lt;</a></span>
 		<span><a class="prev" href="list.jsp?page_selected=<%= prev %>&<%= queryStringCW%>">&lt;</a></span>
-		<%	
-			
-			for(int i = startPage; i < (startPage + 10); i++) {
-				if(i > total_page) {
-					break;
-				} else {
-					String url = "list.jsp?page_selected="+i+"&"+queryStringCW;
-					String selected = "";
-					if(i == page_selected) {
-						selected = "class='selected'";
-					}
-					
-					out.print("<span><a href='"+url+"'"+selected+">"+ i +"</a></span>");
-				}
-			}
-		%>
+		<%= pageList %>
 		<span><a class="next" href="list.jsp?page_selected=<%= next %>&&<%= queryStringCW%>">&gt;</a></span>
 		<span><a class="next" href="list.jsp?page_selected=<%= grandNext %>&&<%= queryStringCW%>">&gt;&gt;</a></span>
 	</div>
