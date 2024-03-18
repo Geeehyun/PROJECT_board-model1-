@@ -80,7 +80,6 @@
 <body>
 <%
 // 게시글 조회 부분
-
 // 게시글 조회를 위한 Map객체 생성 (검색영역, 검색어, 현재 페이지)
 Map<String, Object> param = new HashMap<String, Object>();
 param.put("search_category", search_category);
@@ -99,21 +98,12 @@ dao.close();
 String boardList = PageUtil.makeList(bbsList, total_count, page_selected, queryStringPCW);
 
 // 페이징 관련 부분
-
 //총페이지 개수 계산
 int total_page = (int) Math.ceil((double)total_count / 10);
 
-// 페이징의 시작 페이지 번호 계산
-int startPage = ((int) Math.floor((((double)page_selected - 1)*0.1))*10)+1; // 좀 더 쉬운방법이 있으면 좋겠음.
-
 // 페이징 html 코드 만들어내기
-String pageList = PageUtil.makeMageNumber(total_page, startPage, page_selected, queryStringCW);
+String pageList = PageUtil.makeMageNumber(total_page, 10, page_selected, queryStringCW);
 
-// <<, <, >, >> 버튼 클릭 시 이동할 페이징 계산
-int prev = (page_selected > 1)? page_selected - 1 : 1;
-int grandPrev = (page_selected > 1) ? (((page_selected - 10) > 1) ? page_selected - 10 : 1) : 1;
-int next = (page_selected < total_page)? page_selected + 1 : page_selected;
-int grandNext = (page_selected < total_page) ? (((page_selected + 10) < total_page) ? page_selected + 10 : total_page) : total_page;
 %>
 <main>
 	<h2><a href="list.jsp">게시판 목록</a></h2>
@@ -150,11 +140,7 @@ int grandNext = (page_selected < total_page) ? (((page_selected + 10) < total_pa
 		</tbody>
 	</table>
 	<div class="pageArea">
-		<span><a class="prev" href="list.jsp?page_selected=<%= grandPrev %>&<%= queryStringCW%>">&lt;&lt;</a></span>
-		<span><a class="prev" href="list.jsp?page_selected=<%= prev %>&<%= queryStringCW%>">&lt;</a></span>
 		<%= pageList %>
-		<span><a class="next" href="list.jsp?page_selected=<%= next %>&&<%= queryStringCW%>">&gt;</a></span>
-		<span><a class="next" href="list.jsp?page_selected=<%= grandNext %>&&<%= queryStringCW%>">&gt;&gt;</a></span>
 	</div>
 </main>
 <script>
